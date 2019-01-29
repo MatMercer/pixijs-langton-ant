@@ -20,7 +20,7 @@
     ];
 
     const canvasParentSelector = "#app";
-    const canvasSize = [1920, 1080];
+    const canvasSize = [1000, 1000];
     const canvasRatio = canvasSize[0] / canvasSize[1];
 
     let app;
@@ -114,6 +114,8 @@
         self.antStep = 1000;
         self.totalSteps = 0;
         self.maxSteps = NaN;
+        self.worldSprite = worldSprite;
+        self.zoom = 1.0;
 
         self.ant = new Ant(this);
 
@@ -169,6 +171,8 @@
 
                 worldSprite.texture.update();
             }
+
+            self.applyZoom();
         }
 
         self.reset = function() {
@@ -180,6 +184,11 @@
 
             // Reset the ant
             self.ant.reset();
+        }
+
+        self.applyZoom = function() {
+            self.worldSprite.scale.x = self.zoom;
+            self.worldSprite.scale.y = self.zoom;
         }
 
         // Initial values
@@ -210,6 +219,10 @@
         worldCanvas.height = app.screen.height;
 
         const canvasSprite = new PIXI.Sprite(PIXI.Texture.fromCanvas(worldCanvas));
+        canvasSprite.anchor.x = 0.5;
+        canvasSprite.anchor.y = 0.5;
+        canvasSprite.position.x = canvasSize[0] / 2;
+        canvasSprite.position.y = canvasSize[1] / 2;
 
         canvasSprite.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
 
@@ -217,9 +230,9 @@
 
         $canvasParent.empty();
         $canvasParent.append(app.view);
-        //document.body.appendChild(canvas);
 
         const langton = new LangtonAnt(canvasSprite, ctx, worldCanvas);
+        window.langton = langton;
 
         app.stage.addChild(canvasSprite);
         app.stage.addChild(langton.ant);
@@ -228,7 +241,7 @@
 
         const $controls = $("#controls");
         $controls.removeClass('d-none');
-        new ControlController(langton, $controls);
+        new ControlController(langton, $controls, app.view);
     }
 
     function loadAssets() {
@@ -244,14 +257,34 @@
     });
 }(window.jQuery, window, document));
 
-// TODO: use vuew for 2 way data binding
-function ControlController(langton, $controls) {
+// TODO: use vueJS for 2 way data binding
+function ControlController(langton, $controls, canvas) {
+    const $canvas = $(canvas);
+
     const $resetBtn = $controls.find('.reset');
 
     const $iDelay = $controls.find('#delayRange');
 
+    const zoomSpeed = 0.05;
+    const zoomMin = 0.02;
+
     $iDelay.val(langton.antDelay);
     
+    function onCanvasWheel(e) {
+        let scrollAmm = -e.originalEvent.deltaY;
+
+        if (scrollAmm < 0) {
+            scrollAmm = -1;
+        }
+        else {
+            scrollAmm = 1;
+        }
+
+        langton.zoom += scrollAmm * zoomSpeed;
+
+        langton.zoom = Math.max(langton.zoom, zoomMin);
+    }
+
     function onReset() {
         langton.reset();
     }
@@ -261,6 +294,7 @@ function ControlController(langton, $controls) {
         langton.antDelay = parseInt(newDelay);
     }
 
+    $canvas.on('wheel', onCanvasWheel);
     $resetBtn.on('click', onReset);
     $iDelay.on('input', onDelayChange);
 }
