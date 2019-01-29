@@ -20,8 +20,12 @@
     ];
 
     const canvasParentSelector = "#app";
-    const canvasSize = [1000, 1000];
+    let canvasSize = [1920, 1080];
     const canvasRatio = canvasSize[0] / canvasSize[1];
+
+    if (window.innerWidth / window.innerHeight < 1) {
+        canvasSize = [1024, 1024];
+    }
 
     let app;
 
@@ -30,9 +34,11 @@
         const antTex = PIXI.utils.TextureCache['ant'];
         const ant = new PIXI.Sprite(antTex);
         ant.anchor.set(0.5);
+        ant.width = 20;
+        ant.height = 20;
 
         // Step is how much the ant walks each time
-        ant.step = vec2.fromValues(antTex.width, antTex.height);
+        ant.step = vec2.fromValues(30, 30);
 
         // Relative coord
         ant.coord = vec2.create();
@@ -80,13 +86,14 @@
             this.walk(rotTable[rotIdx], delta);
         }
 
-        ant._rotate_dir = function(dir, delta) {
+        ant._rotate_dir = function(dir) {
             // PI * (x + y) * ((x - (y / 2)) - 0.5)
             this.rotation = Math.PI * (dir[0] + dir[1]) * ((dir[0] - (dir[1] / 2)) - 0.5);
         }
 
         ant.reset = function() {
             this.lastDir = UP;
+            ant._rotate_dir(UP);
             this.coord[0] = Math.abs(ctx.gridSize / 2) - 1;
             this.coord[1] = Math.abs(ctx.gridSize / 2) - 1;
 
@@ -94,7 +101,8 @@
             this.y = app.screen.height / 2;
 
             // Fix x axis centering
-            this.x += this.step[0] / 2;
+            this.x -= this.step[0] / 2;
+            this.y -= this.step[1] / 2;
         }
 
         // Initial values
@@ -111,19 +119,19 @@
         self.now = Date.now();
         self.lastAntStep = self.now;
         self.antDelay = 1000;
-        self.antStep = 1000;
+        self.antStep = 1;
         self.totalSteps = 0;
         self.maxSteps = NaN;
         self.worldSprite = worldSprite;
-        self.zoom = 1.0;
+        self.scale = 30.0;
 
         self.ant = new Ant(this);
 
         //self.prog = [1, 0, 1, 1, 0, 1, 0];
-        //self.prog = [1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0];
+        self.prog = [1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0];
         //self.prog = [1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1];
         //self.prog = [1, 1, 1, 0, 1];
-        self.prog = [1, 1, 1, 0, 1, 0, 0, 1, 0, 1];
+        //self.prog = [1, 1, 1, 0, 1, 0, 0, 1, 0, 1];
         //self.prog = [1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1];
         //self.prog = [1, 0];
 
@@ -187,8 +195,8 @@
         }
 
         self.applyZoom = function() {
-            self.worldSprite.scale.x = self.zoom;
-            self.worldSprite.scale.y = self.zoom;
+            self.worldSprite.scale.x = self.scale;
+            self.worldSprite.scale.y = self.scale;
         }
 
         // Initial values
@@ -215,8 +223,8 @@
         const $canvasParent = $(canvasParentSelector);
 
         const worldCanvas = $('<canvas>')[0];
-        worldCanvas.width = app.screen.width;
-        worldCanvas.height = app.screen.height;
+        worldCanvas.width = 1000;
+        worldCanvas.height = 1000;
 
         const canvasSprite = new PIXI.Sprite(PIXI.Texture.fromCanvas(worldCanvas));
         canvasSprite.anchor.x = 0.5;
@@ -230,12 +238,28 @@
 
         $canvasParent.empty();
         $canvasParent.append(app.view);
+        //document.body.appendChild(worldCanvas);
+
+        var viewport = new PIXI.extras.Viewport({
+                screenWidth: canvasSize[0],
+                screenHeight: canvasSize[1],
+                worldWidth: canvasSize[0],
+                worldHeight: canvasSize[1],
+                interaction: app.renderer.plugins.interaction 
+        });
 
         const langton = new LangtonAnt(canvasSprite, ctx, worldCanvas);
         window.langton = langton;
 
-        app.stage.addChild(canvasSprite);
-        app.stage.addChild(langton.ant);
+        app.stage.addChild(viewport);
+        viewport.addChild(canvasSprite);
+        viewport.addChild(langton.ant);
+
+        viewport
+            .drag()
+            .pinch()
+            .wheel()
+            .decelerate();
 
         app.ticker.add(langton.tick);
 
@@ -264,30 +288,25 @@ function ControlController(langton, $controls, canvas) {
     const $resetBtn = $controls.find('.reset');
 
     const $iDelay = $controls.find('#delayRange');
+    const $iStep = $controls.find('#stepRange');
 
-    const zoomSpeed = 0.05;
+    const zoomSpeed = 0.5;
     const zoomMin = 0.02;
 
     $iDelay.val(langton.antDelay);
+    $iStep.val(langton.antStep);
     
     function onCanvasWheel(e) {
-        let scrollAmm = -e.originalEvent.deltaY;
         e.preventDefault();
-
-        if (scrollAmm < 0) {
-            scrollAmm = -1;
-        }
-        else {
-            scrollAmm = 1;
-        }
-
-        langton.zoom += scrollAmm * zoomSpeed;
-
-        langton.zoom = Math.max(langton.zoom, zoomMin);
     }
 
     function onReset() {
         langton.reset();
+    }
+
+    function onStepChange(e) {
+        let newStep = e.target.value;
+        langton.antStep = parseInt(newStep);
     }
 
     function onDelayChange(e) {
@@ -298,4 +317,5 @@ function ControlController(langton, $controls, canvas) {
     $canvas.on('wheel', onCanvasWheel);
     $resetBtn.on('click', onReset);
     $iDelay.on('input', onDelayChange);
+    $iStep.on('input', onStepChange);
 }
