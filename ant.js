@@ -106,7 +106,7 @@
         const self = this;
 
         self.grid = [];
-        self.gridSize = 5000;
+        self.gridSize = 1000;
 
         self.now = Date.now();
         self.lastAntStep = self.now;
@@ -122,8 +122,8 @@
         //self.prog = [1, 0, 1, 1, 0, 1, 0];
         //self.prog = [1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0];
         //self.prog = [1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1];
-        self.prog = [1, 1, 1, 0, 1];
-        //self.prog = [1, 1, 1, 0, 1, 0, 0, 1, 0, 1];
+        //self.prog = [1, 1, 1, 0, 1];
+        self.prog = [1, 1, 1, 0, 1, 0, 0, 1, 0, 1];
         //self.prog = [1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1];
         //self.prog = [1, 0];
 
@@ -138,7 +138,7 @@
 
         function drawRect(color) {
             g.fillStyle = color;
-            g.fillRect(self.ant.x - (0.5 * self.ant.step[0]), self.ant.y - (0.5 * self.ant.step[1]), self.ant.step[0], self.ant.step[1]);
+            g.fillRect(self.ant.coord[0], self.ant.coord[1], 1, 1);
         }
 
         function antBrain(delta) {
@@ -272,6 +272,7 @@ function ControlController(langton, $controls, canvas) {
     
     function onCanvasWheel(e) {
         let scrollAmm = -e.originalEvent.deltaY;
+        e.preventDefault();
 
         if (scrollAmm < 0) {
             scrollAmm = -1;
