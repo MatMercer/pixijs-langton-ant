@@ -3,22 +3,29 @@ class LangtonWorld {
         this.grid = [];
 
         for (var i = 0; i < size; i += 1) {
-            this.grid[i] = new Int8Array(size);
+            this.grid[i] = new Uint32Array(size);
         }
 
         this.size = size;
     }
 
+    touchCoord(coord) {
+        if (this.grid[coord[0]][coord[1]] === 0) {
+            this.resetCoord(coord);
+        }
+    }
+
     increment(coord) {
+        this.touchCoord(coord);
         this.grid[coord[0]][coord[1]] += 1;
     }
 
     resetCoord(coord) {
-        this.grid[coord[0]][coord[1]] = 0;
+        this.grid[coord[0]][coord[1]] = 1;
     }
 
     value(coord) {
-        return this.grid[coord[0]][coord[1]];
+        return this.grid[coord[0]][coord[1]] - 1;
     }
 }
 
@@ -29,18 +36,21 @@ class LangtonAnt {
 
         this.program = options.program;
 
-        this.coord = new Uint8Array(2);
+        this.coord = new Uint32Array(2);
         this.ground = 0;
 
         this.rotArr = [
             [0, 1], // UP
             [1, 0], // RIGHT
             [0, -1], // DOWN
-            [-1, 0], // LEFT
+            [-1, 0] // LEFT
         ];
 
-        this.coord[0] = Math.abs(this.world.size / 2) - 1;
-        this.coord[1] = Math.abs(this.world.size / 2) - 1;
+        this.coord[0] = Math.ceil(this.world.size / 2);
+        this.coord[1] = Math.ceil(this.world.size / 2);
+
+        // TODO: the user can pre-render the steps
+        this.steps = options.steps || 0;
     }
 
     next() {
@@ -52,10 +62,11 @@ class LangtonAnt {
         }
 
         this.move(this.program[this.world.value(this.coord)]);
+
+        this.steps += 1;
     }
 
     move(command) {
-        console.log(this.coord);
         if (command === 0) {
             this.rotArr.push(
                 this.rotArr.shift()
@@ -67,23 +78,29 @@ class LangtonAnt {
         }
 
         this.incrementCoord(this.rotArr[0]);
-
     }
 
     incrementCoord(dir) {
-        console.log(dir);
         this.coord[0] += dir[0];
         this.coord[1] += dir[1];
     }
 }
 
 const ant = new LangtonAnt({
-    worldSize: 10,
-    program: [1, 0]
+    worldSize: 1000,
+    program: [0, 0, 0, 1, 0]
 });
 
-for (i = 1; i < 20; i += 1) {
+for (i = 0; i < 170000; i += 1) {
     ant.next();
 }
 
-console.table(ant.world.grid);
+const count = new Uint32Array(ant.program.length + 1);
+for (i = 0; i < 1000; i += 1) {
+    for (j = 0; j < 1000; j += 1) {
+        count[ant.world.grid[i][j]] += 1;
+    }
+}
+
+console.log("Final results");
+console.log(count);
