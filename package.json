@@ -1,0 +1,21 @@
+{
+  "name": "langton-ant",
+  "version": "1.0.0",
+  "description": "A Javascript implementation of langton's ant",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MatMercer/pixijs-langton-ant.git"
+  },
+  "keywords": [
+    "langton"
+  ],
+  "author": "MatMercer",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MatMercer/pixijs-langton-ant/issues"
+  },
+  "homepage": "https://github.com/MatMercer/pixijs-langton-ant#readme"
+}
