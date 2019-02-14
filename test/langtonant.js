@@ -14,7 +14,7 @@ describe('Langton Ant', function () {
         }
 
         function testAntProgram(worldSize, steps, program, expected) {
-            it('have the right amount of blocks in the world when doing ' + steps + ' steps with prog ' + program, function () {
+            it('have ' + expected + ' squares in the world when doing ' + steps + ' steps with prog ' + program, function () {
                 const ant = new LangtonAnt({
                     worldSize: worldSize,
                     program: program
@@ -32,7 +32,11 @@ describe('Langton Ant', function () {
             });
         }
 
-        testAntProgram(1000, 917761, [0, 0, 1], [7798, 9880, 9489]);
+        testAntProgram(1000, 12560, [0, 1], [911, 1014]);
         testAntProgram(1000, 28000, [0, 1, 1, 0], [232, 128, 338, 60]);
+        testAntProgram(1000, 328983, [0, 0, 0, 1, 0], [492, 53308, 937, 594, 131]);
+        testAntProgram(1000, 917761, [0, 0, 1], [7798, 9880, 9489]);
+        testAntProgram(1000, 1370573, [0, 0, 1, 1], [8201, 8319, 25504, 7870]);
+        testAntProgram(1000, 20061055, [0, 1, 1, 0], [12782, 7842, 13130, 5387]);
     });
 });
