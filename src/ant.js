@@ -1,8 +1,9 @@
 const LangtonWorld = require('./ant-world');
+const AntMath = require("./ant-math");
 
 class LangtonAnt {
     /**
-     * Assign the project to an employee.
+     * Langton Ant with options
      * @param {Object} options - The options that control the ant, like wolrd size
      * @param {int} options.worldSize - Required value of the initial world size
      * @param {array[int]} options.program - A bit array describing the ant program
@@ -22,6 +23,7 @@ class LangtonAnt {
             [0, -1], // DOWN
             [-1, 0] // LEFT
         ];
+        this.rotIdx = 0;
 
         this.coord[0] = Math.ceil(this.world.size / 2);
         this.coord[1] = Math.ceil(this.world.size / 2);
@@ -31,30 +33,18 @@ class LangtonAnt {
     }
 
     next() {
-        this.world.increment(this.coord);
-        this.ground = this.world.value(this.coord);
+        this.ground = this.world.increment(this.coord, this.program.length);
 
-        if (this.ground === this.program.length) {
-            this.world.resetCoord(this.coord);
-        }
-
-        this.move(this.program[this.world.value(this.coord)]);
+        this.move(this.program[this.ground]);
 
         this.steps += 1;
     }
 
     move(command) {
-        if (command === 0) {
-            this.rotArr.push(
-                this.rotArr.shift()
-            );
-        } else {
-            this.rotArr.unshift(
-                this.rotArr.pop()
-            );
-        }
+        this.rotIdx += command === 0 ? -1 : 1;
+        this.rotIdx = AntMath.cicle(0, this.rotIdx, 3);
 
-        this.incrementCoord(this.rotArr[0]);
+        this.incrementCoord(this.rotArr[this.rotIdx]);
     }
 
     incrementCoord(dir) {
