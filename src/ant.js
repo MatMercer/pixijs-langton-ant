@@ -42,6 +42,11 @@ class LangtonAnt {
         this.steps += 1;
     }
 
+    previous() {
+        this._moveBack();
+        this.steps -= 1;
+    }
+
     _move() {
         this._incrementGround();
         this._rotate();
@@ -59,17 +64,12 @@ class LangtonAnt {
     }
 
     _cycleDirection() {
-        this.direction = AntMath.cicle(0, this.direction, DIRECTION.length - 1);
+        this.direction = AntMath.cycle(0, this.direction, DIRECTION.length - 1);
     }
 
     _walk() {
         this.coord[0] += DIRECTION[this.direction][0];
         this.coord[1] += DIRECTION[this.direction][1];
-    }
-
-    previous() {
-        this._moveBack();
-        this.steps -= 1;
     }
 
     _moveBack() {
