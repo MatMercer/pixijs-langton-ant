@@ -58,14 +58,13 @@ class LangtonAnt {
         this._nextDirection();
     }
 
-    _walk() {
-        const dir = DIRECTION[this.direction];
-        this.coord[0] += dir[0];
-        this.coord[1] += dir[1];
-    }
-
     _nextDirection() {
         this.direction = AntMath.cicle(0, this.direction, DIRECTION.length - 1);
+    }
+
+    _walk() {
+        this.coord[0] += DIRECTION[this.direction][0];
+        this.coord[1] += DIRECTION[this.direction][1];
     }
 }
 

@@ -29,4 +29,3 @@ class LangtonWorld {
 }
 
 module.exports = LangtonWorld;
-
