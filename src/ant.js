@@ -51,20 +51,46 @@ class LangtonAnt {
     _incrementGround() {
         this.ground = this.world.increment(this.coord, this.program.length);
     }
-
+    
     _rotate() {
         const goToRight = this.program[this.ground] === 1;
         this.direction += goToRight ? 1:-1;
-        this._nextDirection();
+        this._cycleDirection();
     }
 
-    _nextDirection() {
+    _cycleDirection() {
         this.direction = AntMath.cicle(0, this.direction, DIRECTION.length - 1);
     }
 
     _walk() {
         this.coord[0] += DIRECTION[this.direction][0];
         this.coord[1] += DIRECTION[this.direction][1];
+    }
+
+    previous() {
+        this._moveBack();
+        this.steps -= 1;
+    }
+
+    _moveBack() {
+        this._walkBack();
+        this._rotateBack();
+        this._decrementGround();
+    }
+
+    _walkBack() {
+        this.coord[0] -= DIRECTION[this.direction][0];
+        this.coord[1] -= DIRECTION[this.direction][1];
+    }
+
+    _rotateBack() {
+        const goToRight = this.program[this.ground] === 1;
+        this.direction -= goToRight ? 1:-1;
+        this._cycleDirection();
+    }
+
+    _decrementGround() {
+        this.ground = this.world.decrement(this.coord, this.program.length);
     }
 }
 

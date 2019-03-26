@@ -1,5 +1,5 @@
-var assert = require('assert');
-var LangtonAnt = require('../src/ant');
+const assert = require('assert');
+const LangtonAnt = require('../src/ant');
 
 class AntTester {
     static countBlocks(ant) {
