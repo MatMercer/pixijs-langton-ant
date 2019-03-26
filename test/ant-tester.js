@@ -20,9 +20,7 @@ class AntTester {
                 program: program
             });
 
-            for (let i = 0; i < steps; i += 1) {
-                ant.next();
-            }
+            AntTester.permuteAnt(ant, steps);
 
             const correct = Uint32Array.from(expected);
             const result = AntTester.countBlocks(ant).slice(1, program.length + 1);
@@ -32,16 +30,14 @@ class AntTester {
     }
 
     static testBackResult(program, before, after) {
+        let ant = new LangtonAnt({
+            worldSize: 1000,
+            program: program.program
+        });
+
+        AntTester.permuteAnt(ant, before.steps);
+
         it('must have the right count when going from ' + before.steps + ' to ' + after.steps + ' steps', function () {
-            let ant = new LangtonAnt({
-                worldSize: 1000,
-                program: program.program
-            });
-
-            for (let i = 0; i < before.steps; i += 1) {
-                ant.next();
-            }
-
             let stepsDifference = before.steps - after.steps;
             for (let i = 0; i < stepsDifference; i += 1) {
                 ant.previous();
@@ -52,6 +48,12 @@ class AntTester {
 
             assert.deepStrictEqual(result, correctAfter);
         })
+    }
+
+    static permuteAnt(ant, steps) {
+        for (let i = 0; i < steps; i += 1) {
+            ant.next();
+        }
     }
 }
 
