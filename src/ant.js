@@ -84,7 +84,7 @@ class LangtonAnt {
     }
 
     _rotateBack() {
-        const goToRight = this.program[this.ground] === 1;
+        const goToRight = this.program[this.world.value(this.coord)] === 1;
         this.direction -= goToRight ? 1:-1;
         this._cycleDirection();
     }

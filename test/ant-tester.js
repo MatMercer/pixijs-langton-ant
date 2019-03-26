@@ -30,6 +30,29 @@ class AntTester {
             assert.deepStrictEqual(result, correct);
         });
     }
+
+    static testBackResult(program, before, after) {
+        it('must have the right count when going from ' + before.steps + ' to ' + after.steps + ' steps', function () {
+            let ant = new LangtonAnt({
+                worldSize: 1000,
+                program: program.program
+            });
+
+            for (let i = 0; i < before.steps; i += 1) {
+                ant.next();
+            }
+
+            let stepsDifference = before.steps - after.steps;
+            for (let i = 0; i < stepsDifference; i += 1) {
+                ant.previous();
+            }
+
+            let correctAfter = Uint32Array.from(after.expected);
+            let result = AntTester.countBlocks(ant).slice(1, program.program.length + 1);
+
+            assert.deepStrictEqual(result, correctAfter);
+        })
+    }
 }
 
 module.exports = AntTester;
