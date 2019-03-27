@@ -2,11 +2,25 @@ module.exports =
     [
         {
             worldSize: 1000,
+            program: [1, 0, 1, 1, 0, 1],
+            results: [
+                {
+                    steps: 0,
+                    expected: [0, 0, 0, 0, 0, 0]
+                },
+                {
+                    steps: 20,
+                    expected: [0, 9, 1, 3, 0, 0]
+                }
+            ]
+        },
+        {
+            worldSize: 1000,
             program: [0, 1],
             results: [
                 {
-                    steps: 500,
-                    expected: [55, 62]
+                    steps: 12540,
+                    expected: [907, 1014]
                 },
                 {
                     steps: 12550,

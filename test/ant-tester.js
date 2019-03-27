@@ -20,7 +20,7 @@ class AntTester {
                 program: program
             });
 
-            AntTester.permuteAnt(ant, steps);
+            AntTester.permuteAntFowards(ant, steps);
 
             const correct = Uint32Array.from(expected);
             const result = AntTester.countBlocks(ant).slice(1, program.length + 1);
@@ -35,24 +35,38 @@ class AntTester {
             program: program.program
         });
 
-        AntTester.permuteAnt(ant, before.steps);
+        AntTester.permuteAntFowards(ant, before.steps);
+        let stepsDifference = before.steps - after.steps;
 
-        it('must have the right count when going from ' + before.steps + ' to ' + after.steps + ' steps', function () {
+        it('have the right count when going from ' + before.steps + ' to ' + after.steps + ' steps', function () {
             let stepsDifference = before.steps - after.steps;
-            for (let i = 0; i < stepsDifference; i += 1) {
-                ant.previous();
-            }
+            AntTester.permuteAntBackwards(ant, stepsDifference);
 
             let correctAfter = Uint32Array.from(after.expected);
+            let result = AntTester.countBlocks(ant).slice(1, program.program.length + 1);
+
+            assert.deepStrictEqual(result, correctAfter);
+        });
+
+        it('have the right count when going from ' + after.steps + ' to ' + before.steps + ' steps', function () {
+            AntTester.permuteAntFowards(ant, stepsDifference);
+
+            let correctAfter = Uint32Array.from(before.expected);
             let result = AntTester.countBlocks(ant).slice(1, program.program.length + 1);
 
             assert.deepStrictEqual(result, correctAfter);
         })
     }
 
-    static permuteAnt(ant, steps) {
+    static permuteAntFowards(ant, steps) {
         for (let i = 0; i < steps; i += 1) {
             ant.next();
+        }
+    }
+
+    static permuteAntBackwards(ant, steps) {
+        for (let i = 0; i < steps; i += 1) {
+            ant.previous();
         }
     }
 }
