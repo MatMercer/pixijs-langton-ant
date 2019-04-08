@@ -22,8 +22,8 @@ class LangtonAnt {
      * @param {array[int]} options.program - A bit array describing the ant program
      */
     constructor(options) {
-        this.program = options.program;
-        this.world = new LangtonWorld(options.worldSize);
+        this.program = options['program'];
+        this.world = new LangtonWorld(options['worldSize']);
         this.coord = new Uint32Array(2);
 
         this.ground = 0;
@@ -34,7 +34,7 @@ class LangtonAnt {
         this.coord[1] = Math.ceil(this.world.size / 2);
 
         // TODO: the user can pre-render the steps
-        this.steps = options.steps || 0;
+        this.steps = options['steps'] || 0;
     }
 
     next() {

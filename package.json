@@ -21,6 +21,12 @@
   "homepage": "https://github.com/MatMercer/pixijs-langton-ant#readme",
   "devDependencies": {
     "mocha": "^5.2.0",
-    "nyc": "^13.3.0"
+    "nyc": "^13.3.0",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.3.0",
+    "webpack-closure-compiler": "^2.1.6"
+  },
+  "dependencies": {
+    "google-closure-compiler": "^20190325.0.0"
   }
 }
