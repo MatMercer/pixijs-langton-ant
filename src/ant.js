@@ -17,7 +17,7 @@ class LangtonAnt {
 
     /**
      * Langton Ant with options
-     * @param {Object} options - The options that control the ant, like wolrd size
+     * @param {Object} options - The options that control the ant, like world size
      * @param {int} options.worldSize - Required value of the initial world size
      * @param {array[int]} options.program - A bit array describing the ant program
      */
@@ -58,9 +58,12 @@ class LangtonAnt {
     }
     
     _rotate() {
-        const goToRight = this.program[this.ground] === 1;
-        this.direction += goToRight ? 1:-1;
+        this.direction += this._programValue(this.ground) ? 1:-1;
         this._cycleDirection();
+    }
+
+    _programValue(index) {
+        return this.program[index];
     }
 
     _cycleDirection() {
@@ -84,9 +87,12 @@ class LangtonAnt {
     }
 
     _rotateBack() {
-        const goToRight = this.program[this.world.value(this.coord)] === 1;
-        this.direction -= goToRight ? 1:-1;
+        this.direction -= this._programValue(this._previousGroundValue()) ? 1:-1;
         this._cycleDirection();
+    }
+
+    _previousGroundValue() {
+        return this.world.value(this.coord);
     }
 
     _decrementGround() {
